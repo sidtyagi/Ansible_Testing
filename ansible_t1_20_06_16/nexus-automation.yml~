@@ -1,0 +1,24 @@
+---
+
+- name: sample playbook trial 1 for automating nexus switches
+  hosts: spine
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: configure interfaces for vpc peer link
+      nxos_interface: interface={{item}} description='N9k1 to NK2 Trial1' mode=layer2 host={{ inventory_hostname }}
+      with_items:
+        - Ethernet1/1
+        - Ethernet1/2
+
+    # Ensure an interface is configured for keepalive link
+    - name: config interface for vpc peer keepalive link
+      nxos_interface: interface={{item}} description='Configured by Ansible for keepalive' mode=layer2 host={{ inventory_hostname }}
+      with_items:
+	- Ethernet2/12
+
+    # Testing without loop
+    - name: config interface going towards leaf switches
+      nxos_interface: interface=Ethernet2/1 description='this should go to 3k' mode=layer2 host={{inventory_hostname}}
